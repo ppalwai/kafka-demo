@@ -2,6 +2,7 @@ package com.ppalwai.kafkademo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -25,6 +26,9 @@ public class KafkaDemoApplication implements ApplicationRunner {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Value("${topic.name}")
+    private String topic;
+
     public void sendMessage(String topicName, String msg) throws ExecutionException, InterruptedException {
         ListenableFuture<SendResult<String, String>> sendResult =  kafkaTemplate.send(topicName, msg);
         log.info("sendResult.toString(): {}", sendResult.completable().get().getRecordMetadata());
@@ -33,13 +37,23 @@ public class KafkaDemoApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         while(true) {
-            sendMessage("topic1", "Message from Spring Boot: " + new Random().nextInt());
+            sendMessage(topic, "Message from Spring Boot: " + new Random().nextInt());
             Thread.sleep(2000);
         }
     }
 
-    @KafkaListener(topics = "topic1", groupId = "group_id")
-    public void listen(String message) {
-        System.out.println("Received Messasge: " + message);
+    @KafkaListener(topics = "first_topic", groupId = "group1")
+    public void consumer1_group1(String message) {
+        log.info("method: {}, message: {}", "consumer1_group1", message);
+    }
+
+    @KafkaListener(topics = "first_topic", groupId = "group1")
+    public void consumer2_group1(String message) {
+        log.info("method: {}, message: {}", "consumer2_group1", message);
+    }
+
+    @KafkaListener(topics = "first_topic", groupId = "group2")
+    public void consumer1_group2(String message) {
+        log.info("method: {}, message: {}", "consumer1_group2", message);
     }
 }

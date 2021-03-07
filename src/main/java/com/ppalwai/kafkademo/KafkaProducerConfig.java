@@ -29,6 +29,7 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
+    /*
     @Bean
     public Producer producer() {
         var properties = new Properties();
@@ -37,4 +38,5 @@ public class KafkaProducerConfig {
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         return new KafkaProducer(properties);
     }
+    */
 }
